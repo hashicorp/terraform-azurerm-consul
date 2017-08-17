@@ -6,8 +6,7 @@
 # the examples/consul-ami/consul.json Packer template.
 # ---------------------------------------------------------------------------------------------------------------------
 
-provider "aws" {
-  region = "${var.aws_region}"
+provider "azure" {
 }
 
 # Terraform 0.9.5 suffered from https://github.com/hashicorp/terraform/issues/14399, which causes this template the
@@ -30,27 +29,27 @@ terraform {
 # NOTE: This Terraform data source must return at least one AMI result or the entire template will fail. See
 # /_ci/publish-amis-in-new-account.md for more information.
 # ---------------------------------------------------------------------------------------------------------------------
-data "aws_ami" "consul" {
-  most_recent      = true
+#data "aws_ami" "consul" {
+#  most_recent      = true
 
   # If we change the AWS Account in which test are run, update this value.
-  owners     = ["562637147889"]
+#  owners     = ["562637147889"]
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+#  filter {
+#    name   = "virtualization-type"
+#    values = ["hvm"]
+#  }
 
-  filter {
-    name   = "is-public"
-    values = ["true"]
-  }
+#  filter {
+#    name   = "is-public"
+#    values = ["true"]
+#  }
 
-  filter {
-    name   = "name"
-    values = ["consul-ubuntu-*"]
-  }
-}
+#  filter {
+#    name   = "name"
+#    values = ["consul-ubuntu-*"]
+#  }
+#}
 
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY THE CONSUL SERVER NODES
