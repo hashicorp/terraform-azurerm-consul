@@ -75,34 +75,8 @@ function join {
   printf "%s$separator" "${values[@]}" | sed "s/$separator$//"
 }
 
-function get_all_consul_server_ips {
-  local expected_num_servers
-  expected_num_servers=$(get_required_terraform_output "num_servers")
-
-  log_info "Looking up public IP addresses for $expected_num_servers Consul server EC2 Instances."
-
-  local ips
-  local i
-
-  for (( i=1; i<="$MAX_RETRIES"; i++ )); do
-    ips=($(get_consul_cluster_ips))
-    if [[ "${#ips[@]}" -eq "$expected_num_servers" ]]; then
-      log_info "Found all $expected_num_servers public IP addresses!"
-      echo "${ips[@]}"
-      return
-    else
-      log_warn "Found ${#ips[@]} of $expected_num_servers public IP addresses. Will sleep for $SLEEP_BETWEEN_RETRIES_SEC seconds and try again."
-      sleep "$SLEEP_BETWEEN_RETRIES_SEC"
-    fi
-  done
-
-  log_error "Failed to find the IP addresses for $expected_num_servers Consul server EC2 Instances after $MAX_RETRIES retries."
-  exit 1
-}
-
 function wait_for_all_consul_servers_to_register {
-  local readonly server_ips=($@)
-  local readonly server_ip="${server_ips[0]}"
+  local readonly server_ip="$(get_required_terraform_output "load_balancer_ip_address_servers")"
 
   local expected_num_servers
   expected_num_servers=$(get_required_terraform_output "num_servers")
@@ -113,7 +87,7 @@ function wait_for_all_consul_servers_to_register {
     log_info "Running 'consul members' command against server at IP address $server_ip"
     # Intentionally use local and readonly here so that this script doesn't exit if the consul members or grep commands
     # exit with an error.
-    local readonly members=$(consul members -rpc-addr="$server_ip:8400")
+    local readonly members=$(consul members --http-addr="$server_ip:8400")
     local readonly server_members=$(echo "$members" | grep "server")
     local readonly num_servers=$(echo "$server_members" | wc -l | tr -d ' ')
 
@@ -131,37 +105,24 @@ function wait_for_all_consul_servers_to_register {
   exit 1
 }
 
-function get_consul_cluster_ips {
-  local aws_region
-  local cluster_tag_key
-  local cluster_tag_value
-  local instances
-
-  aws_region=$(get_required_terraform_output "aws_region")
-  cluster_tag_key=$(get_required_terraform_output "consul_servers_cluster_tag_key")
-  cluster_tag_value=$(get_required_terraform_output "consul_servers_cluster_tag_value")
-
-  log_info "Fetching public IP addresses for EC2 Instances in $aws_region with tag $cluster_tag_key=$cluster_tag_value"
-
-  instances=$(aws ec2 describe-instances \
-    --region "$aws_region" \
-    --filter "Name=tag:$cluster_tag_key,Values=$cluster_tag_value" "Name=instance-state-name,Values=running")
-
-  echo "$instances" | jq -r '.Reservations[].Instances[].PublicIpAddress'
-}
-
 function print_instructions {
-  local readonly server_ips=($@)
-  local readonly server_ip="${server_ips[0]}"
+  local readonly server_ip=$(get_required_terraform_output "load_balancer_ip_address_servers")
+  local readonly num_servers=$(get_required_terraform_output "num_servers")
 
   local instructions=()
-  instructions+=("\nYour Consul servers are running at the following IP addresses:\n\n${server_ips[@]/#/    }\n")
+  instructions+=("\nYour Consul servers are running behind the following load balancer IP address: $server_ip\n")
   instructions+=("Some commands for you to try:\n")
-  instructions+=("    consul members -rpc-addr=$server_ip:8400")
-  instructions+=("    consul kv put -http-addr=$server_ip:8500 foo bar")
-  instructions+=("    consul kv get -http-addr=$server_ip:8500 foo")
-  instructions+=("\nTo see the Consul UI, open the following URL in your web browser:\n")
-  instructions+=("    http://$server_ip:8500/ui/\n")
+  local counter=0
+
+  while [[  $counter -lt $num_servers ]]; do
+    instructions+=("    consul members -rpc-addr=$server_ip:840${counter}")
+    instructions+=("    consul kv put -http-addr=$server_ip:850${counter} foo bar")
+    instructions+=("    consul kv get -http-addr=$server_ip:850${counter} foo")
+    instructions+=("\nTo see the Consul UI, open the following URL in your web browser:\n")
+    instructions+=("    http://$server_ip:850${counter}/ui/\n")
+
+    let counter=counter+1
+  done
 
   local instructions_str
   instructions_str=$(join "\n" "${instructions[@]}")
@@ -170,16 +131,13 @@ function print_instructions {
 }
 
 function run {
-  assert_is_installed "aws"
+  assert_is_installed "az"
   assert_is_installed "jq"
   assert_is_installed "terraform"
   assert_is_installed "consul"
 
-  local server_ips
-  server_ips=$(get_all_consul_server_ips)
-
   wait_for_all_consul_servers_to_register "$server_ips"
-  print_instructions "$server_ips"
+  print_instructions
 }
 
 run

@@ -15,6 +15,10 @@ variable "storage_account_name" {
   description = "The name of the storage account that will be used for images"
 }
 
+variable "subnet_id" {
+  description = "The id of the subnet to deploy the cluster into"
+}
+
 variable "cluster_name" {
   description = "The name of the Consul cluster (e.g. consul-stage). This variable is used to namespace all resources created by this module."
 }
@@ -27,12 +31,12 @@ variable "instance_size" {
   description = "The size of Azure Instances to run for each node in the cluster (e.g. Standard_A0)."
 }
 
-#variable "vpc_id" {
-#  description = "The ID of the VPC in which to deploy the Consul cluster"
-#}
+variable "key_data" {
+  description = "The SSH public key that will be added to SSH authorized_users on the consul instances"
+}
 
 variable "allowed_inbound_cidr_blocks" {
-  description = "A list of CIDR-formatted IP address ranges from which the EC2 Instances will allow connections to Consul"
+  description = "A list of CIDR-formatted IP address ranges from which the Azure Instances will allow connections to Consul"
   type        = "list"
 }
 
@@ -48,6 +52,16 @@ variable "custom_data" {
 variable "instance_tier" {
   description = "Specifies the tier of virtual machines in a scale set. Possible values, standard or basic."
   default = "standard"
+}
+
+variable "computer_name_prefix" {
+  description = "The string the name of each instance in the cluster will be prefixed with"
+  default = "consul"
+}
+
+variable "admin_user_name" {
+  description = "The name of the administrator user for each instance in the cluster"
+  default = "consuladmin"
 }
 
 variable "instance_root_volume_size" {

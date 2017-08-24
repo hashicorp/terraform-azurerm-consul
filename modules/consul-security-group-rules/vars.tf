@@ -3,12 +3,16 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "security_group_id" {
-  description = "The ID of the security group to which we should add the Consul security group rules"
+variable "security_group_name" {
+  description = "The name of the security group to which we should add the Consul security group rules"
+}
+
+variable "resource_group_name" {
+  description = "The name of the resource group that the security group belongs to"
 }
 
 variable "allowed_inbound_cidr_blocks" {
-  description = "A list of CIDR-formatted IP address ranges from which the EC2 Instances will allow connections to Consul"
+  description = "A list of CIDR-formatted IP address ranges from which the Azure Instances will allow connections to Consul"
   type        = "list"
 }
 
