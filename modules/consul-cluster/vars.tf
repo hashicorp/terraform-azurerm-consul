@@ -55,7 +55,7 @@ variable "instance_tier" {
 }
 
 variable "computer_name_prefix" {
-  description = "The string the name of each instance in the cluster will be prefixed with"
+  description = "The string that the name of each instance in the cluster will be prefixed with"
   default = "consul"
 }
 
