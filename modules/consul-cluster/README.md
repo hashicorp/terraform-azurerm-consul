@@ -16,7 +16,7 @@ code by adding a `module` configuration and setting its `source` parameter to UR
 module "consul_cluster" {
   # TODO: update this to the final URL
   # Use version v0.0.1 of the consul-cluster module
-  source = "github.com/gruntwork-io/consul-aws-blueprint//modules/consul-cluster?ref=v0.0.1"
+  source = "github.com/gruntwork-io/terraform-consul-azure//modules/consul-cluster?ref=v0.0.1"
 
   # Specify the ID of the Consul AMI. You should build this using the scripts in the install-consul module.
   ami_id = "ami-abcd1234"
@@ -134,7 +134,7 @@ For example, imagine you deployed a Consul cluster in `us-east-1` as follows:
 
 ```hcl
 module "consul_cluster" {
-  source = "github.com/gruntwork-io/consul-aws-blueprint//modules/consul-cluster?ref=v0.0.1"
+  source = "github.com/gruntwork-io/terraform-consul-azure//modules/consul-cluster?ref=v0.0.1"
 
   # Add this tag to each node in the cluster
   cluster_tag_key   = "consul-cluster"

@@ -22,8 +22,8 @@ To install Consul, use `git` to clone this repository at a specific tag (see the
 for all available tags) and run the `install-consul` script:
 
 ```
-git clone --branch <VERSION> https://github.com/gruntwork-io/consul-aws-blueprint.git
-consul-aws-blueprint/modules/install-consul/install-consul --version 0.8.0
+git clone --branch <VERSION> https://github.com/gruntwork-io/terraform-consul-azure.git
+terraform-consul-azure/modules/install-consul/install-consul --version 0.8.0
 ```
 
 The `install-consul` script will install Consul, its dependencies, and the [run-consul script](/modules/run-consul).
