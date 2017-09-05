@@ -5,7 +5,7 @@
     "tenant_id": "{{env `ARM_TENANT_ID`}}",
     "client_id": "{{env `ARM_CLIENT_ID`}}",
     "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
-    "azure_location": "East US",
+    "azure_location": null,
     "resource_group_name": "consul",
     "consul_version": "0.9.2"
   },

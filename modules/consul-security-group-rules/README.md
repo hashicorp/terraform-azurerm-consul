@@ -23,7 +23,7 @@ have the necessary ports open for using Consul, you can use this module as follo
 
 ```hcl
 module "security_group_rules" {
-  source = "git::git@github.com:gruntwork-io/consul-aws-blueprint.git//modules/consul-security-group-rules?ref=v0.0.2"
+  source = "git::git@github.com:gruntwork-io/terraform-consul-azure.git//modules/consul-security-group-rules?ref=v0.0.2"
 
   security_group_id = "${module.nomad_servers.security_group_id}"
   
