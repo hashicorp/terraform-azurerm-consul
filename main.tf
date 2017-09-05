@@ -71,7 +71,7 @@ module "consul_servers" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# THE USER DATA SCRIPT THAT WILL RUN ON EACH CONSUL SERVER EC2 INSTANCE WHEN IT'S BOOTING
+# THE USER DATA SCRIPT THAT WILL RUN ON EACH CONSUL SERVER AZURE INSTANCE WHEN IT'S BOOTING
 # This script will configure and start Consul
 # ---------------------------------------------------------------------------------------------------------------------
 

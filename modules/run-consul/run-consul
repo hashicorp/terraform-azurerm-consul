@@ -83,7 +83,7 @@ function assert_not_empty {
 
 function lookup_path_in_instance_metadata {
   local readonly path="$1"
-  curl --silent -H Metadata:true --location "$AZURE_INSTANCE_METADATA_URL" | jq -r "$path"
+  curl --silent --show-error --header Metadata:true --location "$AZURE_INSTANCE_METADATA_URL" | jq -r "$path"
 }
 
 function get_instance_ip_address {
