@@ -1,17 +1,17 @@
 # Consul Image
 
-This folder shows an example of how to use the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-consul) and 
-[install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-dnsmasq) modules with [Packer](https://www.packer.io/) to create an Azure Image
+This folder shows an example of how to use the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul) and 
+[install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) modules with [Packer](https://www.packer.io/) to create an Azure Image
 that has Consul and Dnsmasq installed on top of Ubuntu 16.04.
 
 This Image will have [Consul](https://www.consul.io/) installed and configured to automatically join a cluster during 
 boot-up. They also have [Dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html) installed and configured to use 
 Consul for DNS lookups of the `.consul` domain (e.g. `foo.service.consul`) (see [registering 
 services](https://www.consul.io/intro/getting-started/services.html) for instructions on how to register your services
-in Consul). To see how to deploy this AMI, check out the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster). 
+in Consul). To see how to deploy this AMI, check out the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster). 
 
 For more info on Consul installation and configuration, check out the 
-[install-consul](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-consul) and [install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-dnsmasq) documentation.
+[install-consul](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul) and [install-dnsmasq](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-dnsmasq) documentation.
 
 
 
@@ -27,7 +27,7 @@ To build the Consul Image:
 1. Run `packer build consul.json`.
 
 When the build finishes, it will output the IDs of the new AMIs. To see how to deploy one of these Images, check out the 
-[consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster).
+[consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster).
 
 
 
@@ -47,8 +47,8 @@ provisioner. Instead of:
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-consul-azure/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-consul-azure/modules/install-dnsmasq/install-dnsmasq"
+      "/tmp/terraform-consul-azure/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
@@ -63,8 +63,8 @@ Your code should look more like this:
     "type": "shell",
     "inline": [
       "git clone --branch <MODULE_VERSION> https://github.com/gruntwork-io/terraform-consul-azure.git /tmp/terraform-consul-azure",
-      "/tmp/terraform-consul-azure/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-consul-azure/modules/install-dnsmasq/install-dnsmasq"
+      "/tmp/terraform-consul-azure/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
