@@ -48,7 +48,6 @@ variable "custom_data" {
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
-
 variable "instance_tier" {
   description = "Specifies the tier of virtual machines in a scale set. Possible values, standard or basic."
   default = "standard"
