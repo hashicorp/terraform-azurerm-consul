@@ -3,13 +3,11 @@
 
 set -e
 
-readonly AWS_ASG_TAG_KEY="aws:autoscaling:groupName"
-
 readonly CONSUL_CONFIG_FILE="default.json"
 readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor/conf.d/run-consul.conf"
 
-readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
-readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
+readonly AZURE_INSTANCE_METADATA_URL="http://169.254.169.254/metadata/instance?api-version=2017-07-01"
+readonly DEFAULT_RAFT_PROTOCOL="3"
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_NAME="$(basename "$0")"
@@ -24,12 +22,17 @@ function print_usage {
   echo
   echo -e "  --server\t\tIf set, run in server mode. Optional. Exactly one of --server or --client must be set."
   echo -e "  --client\t\tIf set, run in client mode. Optional. Exactly one of --server or --client must be set."
-  echo -e "  --cluster-tag-key\tAutomatically form a cluster with Instances that have this tag key and the tag value in --cluster-tag-value. Optional."
-  echo -e "  --cluster-tag-value\tAutomatically form a cluster with Instances that have the tag key in --cluster-tag-key and this tag value. Optional."
+  echo -e "  --subscription-id\t\t the Azure Subscription Id. Required."
+  echo -e "  --tenant-id\t\t the Azure Tenant Id. Required."
+  echo -e "  --client-id\t\t the Azure Client Id. Required."
+  echo -e "  --secret-access-key\t\t the Azure Secret Access Key. Required."
   echo -e "  --config-dir\t\tThe path to the Consul config folder. Optional. Default is the absolute path of '../config', relative to this script."
   echo -e "  --data-dir\t\tThe path to the Consul data folder. Optional. Default is the absolute path of '../data', relative to this script."
   echo -e "  --log-dir\t\tThe path to the Consul log folder. Optional. Default is the absolute path of '../log', relative to this script."
   echo -e "  --bin-dir\t\tThe path to the folder with Consul binary. Optional. Default is the absolute path of the parent folder of this script."
+  echo -e "  --raft-protocol\tThis controls the internal version of the Raft consensus protocol used for server "
+  echo -e "                 \tcommunications. Must be set to 3 in order to gain access to Autopilot features, with the"
+  echo -e "                 \texception of cleanup_dead_servers. Default: 3"
   echo -e "  --user\t\tThe user to run Consul as. Optional. Default is to use the owner of --config-dir."
   echo -e "  --skip-consul-config\tIf this flag is set, don't generate a Consul configuration file. Optional. Default is false."
   echo
@@ -80,65 +83,89 @@ function assert_not_empty {
 
 function lookup_path_in_instance_metadata {
   local readonly path="$1"
-  curl --silent --location "$EC2_INSTANCE_METADATA_URL/$path/"
-}
-
-function lookup_path_in_instance_dynamic_data {
-  local readonly path="$1"
-  curl --silent --location "$EC2_INSTANCE_DYNAMIC_DATA_URL/$path/"
+  curl --silent --show-error --header Metadata:true --location "$AZURE_INSTANCE_METADATA_URL" | jq -r "$path"
 }
 
 function get_instance_ip_address {
-  lookup_path_in_instance_metadata "local-ipv4"
+  lookup_path_in_instance_metadata ".network.interface[0].ipv4.ipAddress[0].privateIpAddress"
 }
 
 function get_instance_id {
-  lookup_path_in_instance_metadata "instance-id"
+  lookup_path_in_instance_metadata ".compute.vmId"
 }
 
-function get_instance_region {
-  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
+function get_instance_location {
+  lookup_path_in_instance_metadata ".compute.location"
 }
 
-function get_instance_tags {
-  local readonly instance_id="$1"
-  local readonly instance_region="$2"
-
-  log_info "Looking up tags for Instance $instance_id in $instance_region"
-  aws ec2 describe-tags --region "$instance_region" --filters "Name=resource-type,Values=instance" "Name=resource-id,Values=${instance_id}"
+function get_instance_resource_group {
+  lookup_path_in_instance_metadata ".compute.resourceGroupName"
 }
 
-function get_asg_size {
-  local readonly asg_name="$1"
-  local readonly aws_region="$2"
-  local asg_json=""
+function get_instance_name {
+  lookup_path_in_instance_metadata ".compute.name"
+}
 
-  log_info "Looking up the size of the Auto Scaling Group $asg_name in $aws_region"
-  asg_json=$(aws autoscaling describe-auto-scaling-groups --region "$aws_region" --auto-scaling-group-names "$asg_name")
-  echo "$asg_json" | jq -r '.AutoScalingGroups[0].DesiredCapacity'
+function get_other_scale_set_member_ip {
+    local readonly resource_group_name="$1"
+    local readonly scale_set_name="$2"
+    local readonly my_ip_address="$3"
+
+    ip_list=($(az vmss nic list --resource-group "$resource_group_name" --vmss-name "$scale_set_name" | jq '.[].ipConfigurations[].privateIpAddress'))
+    other_ip=""
+
+    for ip in ${ip_list[@]}; do
+        if [[ "$my_ip_address" != "$ip" ]]; then
+            other_ip="$ip"
+        fi
+    done
+
+    if [[ -z "$other_ip" ]]; then
+        log_warn "This Azure Instance does not appear to be part of a Scale Set, so cannot set retry_join peer."
+        echo ""
+    else
+        echo "$other_ip"
+    fi
+}
+
+function find_scale_set {
+  local readonly resource_group_name="$1"
+  local readonly instance_id="$2"
+
+  scale_set_name="unknown"
+  log_info "Finding the scale set Instance $instance_id belongs to"
+  scale_sets=($(az vmss list | jq -r .[]'.name'))
+  for scale_set in ${scale_sets[@]}; do
+    local instances=($(az vmss list-instances --resource-group $resource_group_name --name $scale_set | jq -r .[]'.vmId'))
+    for instance in ${instances[@]}; do
+        if [[ "$instance"==$instance_id ]]; then
+            scale_set_name=$scale_set
+        fi
+    done
+  done
+  echo "$scale_set_name"
+}
+
+function get_scale_set_size {
+  local readonly resource_group_name="$1"
+  local readonly scale_set_name="$2"
+  local vmss_json=""
+
+  log_info "Looking up the size of the Scale Set $scale_set_name in $resource_group_name"
+  vmss_json=$(az vmss list-instances --resource-group $resource_group_name --name $scale_set_name)
+  echo "$vmss_json" | jq '. | length'
 }
 
 function get_cluster_size {
-  local readonly instance_tags="$1"
-  local readonly aws_region="$2"
+  local readonly resource_group_name="$1"
+  local readonly scale_set_name="$2"
 
-  local asg_name=""
-  asg_name=$(get_tag_value "$instance_tags" "$AWS_ASG_TAG_KEY")
-  if [[ -z "$asg_name" ]]; then
-    log_warn "This EC2 Instance does not appear to be part of an Auto Scaling Group, so cannot determine cluster size. Setting cluster size to 1."
+  if [[ "$scale_set_name" = "unknown" ]]; then
+    log_warn "This Azure Instance does not appear to be part of a Scale Set, so cannot determine cluster size. Setting cluster size to 1."
     echo 1
   else
-    get_asg_size "$asg_name" "$aws_region"
+    get_scale_set_size "$resource_group_name" "$scale_set_name"
   fi
-}
-
-# Get the value for a specific tag from the tags JSON returned by the AWS describe-tags:
-# https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html
-function get_tag_value {
-  local readonly tags="$1"
-  local readonly tag_key="$2"
-
-  echo "$tags" | jq -r ".Tags[] | select(.Key == \"$tag_key\") | .Value"
 }
 
 function assert_is_installed {
@@ -152,41 +179,36 @@ function assert_is_installed {
 
 function generate_consul_config {
   local readonly server="$1"
-  local readonly config_dir="$2"
-  local readonly user="$3"
-  local readonly cluster_tag_key="$4"
-  local readonly cluster_tag_value="$5"
+  local readonly raft_protocol="$2"
+  local readonly config_dir="$3"
+  local readonly user="$4"
+  local readonly instance_resource_group="$5"
+  local readonly instance_id="$6"
+  local readonly scale_set_name="$7"
   local readonly config_path="$config_dir/$CONSUL_CONFIG_FILE"
 
-  local instance_id=""
   local instance_ip_address=""
-  local instance_region=""
+  local instance_location=""
 
-  instance_id=$(get_instance_id)
   instance_ip_address=$(get_instance_ip_address)
-  instance_region=$(get_instance_region)
+  instance_location=$(get_instance_location)
+  peer_ip=$(get_other_scale_set_member_ip "$instance_resource_group" "$scale_set_name" "$instance_ip_address")
 
   local retry_join_json=""
-  if [[ -z "$cluster_tag_key" || -z "$cluster_tag_value" ]]; then
-    log_warn "Either the cluster tag key ($cluster_tag_key) or value ($cluster_tag_value) is empty. Will not automatically try to form a cluster based on EC2 tags."
+  if [[ -z "$peer_ip" ]]; then
+    log_warn "Can not determine another scale set member. Will not automatically try to form a cluster based on Azure scale set."
   else
     retry_join_json=$(cat <<EOF
-  "retry_join_ec2": {
-    "tag_key": "$cluster_tag_key",
-    "tag_value": "$cluster_tag_value",
-    "region": "$instance_region"
-  },
+"retry_join": [$peer_ip],
 EOF
 )
   fi
 
   local bootstrap_expect=""
   if [[ "$server" == "true" ]]; then
-    local instance_tags=""
     local cluster_size=""
 
-    instance_tags=$(get_instance_tags "$instance_id" "$instance_region")
-    cluster_size=$(get_cluster_size "$instance_tags" "$instance_region")
+    cluster_size=$(get_cluster_size "$instance_resource_group" "$scale_set_name")
 
     bootstrap_expect="\"bootstrap_expect\": $cluster_size,"
   fi
@@ -198,11 +220,12 @@ EOF
   "bind_addr": "$instance_ip_address",
   $bootstrap_expect
   "client_addr": "0.0.0.0",
-  "datacenter": "$instance_region",
+  "datacenter": "$instance_location",
   "node_name": "$instance_id",
   $retry_join_json
   "server": $server,
-  "ui": true
+  "ui": true,
+  "raft_protocol": $raft_protocol
 }
 EOF
   chown "$user:$user" "$config_path"
@@ -242,17 +265,31 @@ function get_owner_of_path {
   ls -ld "$path" | awk '{print $3}'
 }
 
+function do_azure_login {
+  local tenant_id="$1"
+  local client_id="$2"
+  local secret_access_key="$3"
+  log_info "Logging into the Azure API as service principal $client_id"
+  result=$(az login --service-principal -u "$client_id" -p "$secret_access_key" --tenant "$tenant_id")
+}
+
 function run {
   local server="false"
   local client="false"
+  local scale_set_name=""
   local config_dir=""
   local data_dir=""
   local log_dir=""
   local bin_dir=""
   local user=""
-  local cluster_tag_key=""
+  local cluster_tag_key="$AZURE_TAG_KEY"
   local cluster_tag_value=""
+  local subscription_id=""
+  local tenant_id=""
+  local client_id=""
+  local secret_access_key=""
   local skip_consul_config="false"
+  local raft_protocol="$DEFAULT_RAFT_PROTOCOL"
   local all_args=()
 
   while [[ $# > 0 ]]; do
@@ -264,6 +301,16 @@ function run {
         ;;
       --client)
         client="true"
+        ;;
+      --scale-set-name)
+        assert_not_empty "$key" "$2"
+        scale_set_name="$2"
+        shift
+        ;;
+      --raft-protocol)
+        assert_not_empty "$key" "$2"
+        raft_protocol="$2"
+        shift
         ;;
       --config-dir)
         assert_not_empty "$key" "$2"
@@ -290,18 +337,28 @@ function run {
         user="$2"
         shift
         ;;
-      --cluster-tag-key)
-        assert_not_empty "$key" "$2"
-        cluster_tag_key="$2"
-        shift
-        ;;
-      --cluster-tag-value)
-        assert_not_empty "$key" "$2"
-        cluster_tag_value="$2"
-        shift
-        ;;
       --skip-consul-config)
         skip_consul_config="true"
+        ;;
+      --subscription-id)
+        assert_not_empty "$key" "$2"
+        subscription_id="$2"
+        shift
+        ;;
+      --tenant-id)
+        assert_not_empty "$key" "$2"
+        tenant_id="$2"
+        shift
+        ;;
+      --client-id)
+        assert_not_empty "$key" "$2"
+        client_id="$2"
+        shift
+        ;;
+      --secret-access-key)
+        assert_not_empty "$key" "$2"
+        secret_access_key="$2"
+        shift
         ;;
       --help)
         print_usage
@@ -317,13 +374,25 @@ function run {
     shift
   done
 
+  assert_not_empty "subscription-id" "$subscription_id"
+  assert_not_empty "tenant-id" "$tenant_id"
+  assert_not_empty "client-id" "$client_id"
+  assert_not_empty "secret-access-key" "$secret_access_key"
+
+  do_azure_login "$tenant_id" "$client_id" "$secret_access_key"
+
   if [[ ("$server" == "true" && "$client" == "true") || ("$server" == "false" && "$client" == "false") ]]; then
     log_error "Exactly one of --server or --client must be set."
     exit 1
   fi
 
+  if [[ "$client" == "true" && -z "$scale_set_name" ]]; then
+    log_error "--scale-set-name must be set if --client is set."
+    exit 1
+  fi
+
   assert_is_installed "supervisorctl"
-  assert_is_installed "aws"
+  assert_is_installed "az"
   assert_is_installed "curl"
   assert_is_installed "jq"
 
@@ -350,7 +419,21 @@ function run {
   if [[ "$skip_consul_config" == "true" ]]; then
     log_info "The --skip-consul-config flag is set, so will not generate a default Consul config file."
   else
-    generate_consul_config "$server" "$config_dir" "$user" "$cluster_tag_key" "$cluster_tag_value"
+    instance_id=$(get_instance_id)
+    resource_group=$(get_instance_resource_group)
+
+    if [[ -z "$scale_set_name" ]]; then
+      scale_set_name=$(find_scale_set "$resource_group" "$instance_id")
+    fi
+
+    generate_consul_config \
+        "$server" \
+        "$raft_protocol" \
+        "$config_dir" \
+        "$user" \
+        "$resource_group" \
+        "$instance_id" \
+        "$scale_set_name"
   fi
 
   generate_supervisor_config "$SUPERVISOR_CONFIG_PATH" "$config_dir" "$data_dir" "$log_dir" "$bin_dir" "$user"

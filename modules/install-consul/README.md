@@ -1,9 +1,9 @@
 # Consul Install Script
 
 This folder contains a script for installing Consul and its dependencies. Use this script along with the
-[run-consul script](/modules/run-consul) to create a Consul [Amazon Machine Image 
+[run-consul script](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-consul) to create a Consul [Amazon Machine Image 
 (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that can be deployed in 
-[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [consul-cluster module](/modules/consul-cluster).
+[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [consul-cluster module](https://github.com/gruntwork-io/terraform-consul-azure/modules/consul-cluster).
 
 This script has been tested on the following operating systems:
 
@@ -22,19 +22,19 @@ To install Consul, use `git` to clone this repository at a specific tag (see the
 for all available tags) and run the `install-consul` script:
 
 ```
-git clone --branch <VERSION> https://github.com/gruntwork-io/consul-aws-blueprint.git
-consul-aws-blueprint/modules/install-consul/install-consul --version 0.8.0
+git clone --branch <VERSION> https://github.com/gruntwork-io/terraform-consul-azure.git
+terraform-consul-azure/modules/install-consul/install-consul --version 0.8.0
 ```
 
-The `install-consul` script will install Consul, its dependencies, and the [run-consul script](/modules/run-consul).
+The `install-consul` script will install Consul, its dependencies, and the [run-consul script](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-consul).
 The `run-consul` script is also run when the server is booting to start Consul and configure it to automatically 
 join other nodes to form a cluster.
 
 We recommend running the `install-consul` script as part of a [Packer](https://www.packer.io/) template to create a
 Consul [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) (see the 
-[consul-ami example](/examples/consul-ami) for a fully-working sample code). You can then deploy the AMI across an Auto 
-Scaling Group using the [consul-cluster module](/modules/consul-cluster) (see the [consul-cluster 
-example](/examples/consul-cluster) for fully-working sample code).
+[consul-ami example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-ami) for a fully-working sample code). You can then deploy the AMI across an Auto 
+Scaling Group using the [consul-cluster module](https://github.com/gruntwork-io/terraform-consul-azure/modules/consul-cluster) (see the [consul-cluster 
+example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster) for fully-working sample code).
 
 
 
@@ -83,7 +83,7 @@ Install the following:
 * `consul`: Download the Consul zip file from the [downloads page](https://www.consul.io/downloads.html) (the version 
   number is configurable via the `--version` argument), and extract the `consul` binary into `/opt/consul/bin`. Add a
   symlink to the `consul` binary in `/usr/local/bin`.
-* `run-consul`: Copy the [run-consul script](/modules/run-consul) into `/opt/consul/bin`. 
+* `run-consul`: Copy the [run-consul script](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-consul) into `/opt/consul/bin`. 
 
 
 ### Install supervisord
