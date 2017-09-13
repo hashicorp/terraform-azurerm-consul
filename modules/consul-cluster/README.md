@@ -3,7 +3,7 @@
 This folder contains a [Terraform](https://www.terraform.io/) module to deploy a 
 [Consul](https://www.consul.io/) cluster in [Azure](https://azure.microsoft.com/) on top of a Scale Set. This module 
 is designed to deploy an [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) 
-that has Consul installed via the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-consul) module in this Module.
+that has Consul installed via the [install-consul](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul) module in this Module.
 
 ## How do you use this module?
 
@@ -43,17 +43,17 @@ Note the following parameters:
 
 * `image_uri`: Use this parameter to specify the URI of a Vault [Azure Managed Image]
 (https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) to deploy on each server in the 
-cluster. You should install Vault in this image using the scripts in the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) module.
+cluster. You should install Vault in this image using the scripts in the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-vault) module.
   
 * `custom_data`: Use this parameter to specify a [Custom 
   Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data) script that each
-  server will run during boot. This is where you can use the [run-vault script](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-vault) to configure and 
-  run Vault. The `run-vault` script is one of the scripts installed by the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/modules/install-vault) 
+  server will run during boot. This is where you can use the [run-vault script](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-vault) to configure and 
+  run Vault. The `run-vault` script is one of the scripts installed by the [install-vault](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-vault) 
   module. 
 
 You can find the other parameters in [vars.tf](vars.tf).
 
-Check out the [main example](https://github.com/gruntwork-io/terraform-consul-azure/MAIN.md) for fully-working sample code. 
+Check out the [main example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/MAIN.md) for fully-working sample code. 
 
 
 ## How do you connect to the Consul cluster?
@@ -62,11 +62,11 @@ Check out the [main example](https://github.com/gruntwork-io/terraform-consul-az
 
 If you want to connect to the cluster from your own computer, the easiest way is to use the [HTTP 
 API](https://www.consul.io/docs/agent/http.html). Note that this only works if the Consul cluster is running in public 
-subnets and/or your default VPC (as in the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster)), which is OK for testing
+subnets and/or your default VPC (as in the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster)), which is OK for testing
 and experimentation, but NOT recommended for production usage.
 
-To use the HTTP API, you first need to get the public IP address of one of the Consul Servers. If you're running the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster), the 
-[consul-examples-helper.sh script](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-examples-helper/consul-examples-helper.sh) will do the lookup 
+To use the HTTP API, you first need to get the public IP address of one of the Consul Servers. If you're running the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster), the 
+[consul-examples-helper.sh script](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-examples-helper/consul-examples-helper.sh) will do the lookup 
 for you automatically (note, you must have the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), 
 [jq](https://stedolan.github.io/jq/), and the [Consul agent](https://www.consul.io/) installed locally):
 
@@ -184,7 +184,7 @@ Here are some of the main security considerations to keep in mind when using thi
 ### Encryption in transit
 
 Consul can encrypt all of its network traffic. For instructions on enabling network encryption, have a look at the
-[How do you handle encryption documentation](https://github.com/gruntwork-io/terraform-consul-azure/modules/run-consul#how-do-you-handle-encryption).
+[How do you handle encryption documentation](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/run-consul#how-do-you-handle-encryption).
 
 
 ### Encryption at rest
