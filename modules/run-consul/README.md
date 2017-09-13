@@ -1,16 +1,11 @@
 # Consul Run Script
 
-This folder contains a script for configuring and running Consul on an [AWS](https://aws.amazon.com/) server. This 
+This folder contains a script for configuring and running Consul on an [Azure](https://azure.microsoft.com/) server. This 
 script has been tested on the following operating systems:
 
 * Ubuntu 16.04
-* Amazon Linux
 
-There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
-
-
-
-
+There is a good chance it will work on other flavors of Debian as well.
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Consul itself), using the [install-consul 
@@ -39,10 +34,10 @@ This will:
 
 1. Tell Supervisor to load the new configuration file, thereby starting Consul.
 
-We recommend using the `run-consul` command as part of [User 
-Data](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html#user-data-shell-scripts), so that it executes
-when the EC2 Instance is first booting. After runing `run-consul` on that initial boot, the `supervisord` configuration 
-will automatically restart Consul if it crashes or the EC2 instance reboots.
+We recommend using the `run-consul` command as part of [Custom 
+Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/inject-custom-data), so that it executes
+when the Azure Instance is first booting. After runing `run-consul` on that initial boot, the `supervisord` configuration 
+will automatically restart Consul if it crashes or the Azure instance reboots.
 
 See the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/examples/consul-cluster) for fully-working sample code.
 
@@ -53,12 +48,12 @@ See the [consul-cluster example](https://github.com/gruntwork-io/terraform-consu
 
 The `run-consul` script accepts the following arguments:
 
+* `subscription-id` (required): The Azure Subscription Id"
+* `tenant-id` (required): The Azure Tenant Id."
+* `client-id` (required): The Azure Client Id."
+* `secret-access-key` (required): The Azure Secret Access Key. Required."
 * `server` (optional): If set, run in server mode. Exactly one of `--server` or `--client` must be set.
 * `client` (optional): If set, run in client mode. Exactly one of `--server` or `--client` must be set. 
-* `cluster-tag-key` (optional): Automatically form a cluster with Instances that have this tag key and the tag value
-  in `--cluster-tag-value`.
-* `cluster-tag-value` (optional): Automatically form a cluster with Instances that have the tag key in 
-  `--cluster-tag-key` and this tag value.
 * `config-dir` (optional): The path to the Consul config folder. Default is to take the absolute path of `../config`, 
   relative to the `run-consul` script itself.
 * `data-dir` (optional): The path to the Consul config folder. Default is to take the absolute path of `../data`, 
@@ -70,10 +65,8 @@ The `run-consul` script accepts the following arguments:
 Example:
 
 ```
-/opt/consul/bin/run-consul --server --cluster-tag-key consul-cluster --cluster-tag-value prod-cluster 
+/opt/consul/bin/run-consul --server --subscription-id [REDACTED] --tenant-id [REDACTED] --client-id [REDACTED] --secret-access-key [REDACTED] --cluster-tag-key consul-cluster --cluster-tag-value prod-cluster 
 ```
-
-
 
 
 ## Consul configuration
@@ -110,17 +103,7 @@ available.
 
 * [node_name](https://www.consul.io/docs/agent/options.html#node_name): Set to the instance id, as fetched from 
   [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
-
-* [retry_join_ec2](https://www.consul.io/docs/agent/options.html#retry_join_ec2): Look up the EC2 Instances tags
-  (using the [describe-tags API](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html)) and set the
-  following keys for this setting:
-    * [tag_key](https://www.consul.io/docs/agent/options.html#tag_key): Set to the value of the `--cluster-tag-key`
-      argument.
-    * [tag_value](https://www.consul.io/docs/agent/options.html#tag_value): Set to the value this EC2 Instance has for
-      the `tag_key`. If the key is not set, then the `retry_join_ec2` setting will NOT be included in the config file.
-    * [region](https://www.consul.io/docs/agent/options.html#region): Set to the current AWS region (e.g. `us-east-1`), 
-      as fetched from [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
-      
+     
 * [server](https://www.consul.io/docs/agent/options.html#server): Set to true if `--server` is set.
 
 * [ui](https://www.consul.io/docs/agent/options.html#ui): Set to true.
@@ -134,15 +117,13 @@ To override the default configuration, simply put your own configuration file in
 [merge them together in alphabetical order](https://www.consul.io/docs/agent/options.html#_config_dir), so that 
 settings in files that come later in the alphabet will override the earlier ones. 
 
-For example, to override the default `retry_join_ec2` settings, you could create a file called `tags.json` with the
+For example, to override the default `retry_join` settings, you could create a file called `tags.json` with the
 contents:
 
 ```json
 {
-  "retry_join_ec2": {
-    "tag_key": "custom-key",
-    "tag_value": "custom-value",
-    "region": "us-west-1"
+  "retry_join": {
+    "peer": "10.1.1.1"
   }
 }
 ```
@@ -154,26 +135,11 @@ at all using the `--skip-consul-config` flag:
 /opt/consul/bin/run-consul --server --skip-consul-config
 ```
 
-
-### Required permissions
-
-The `run-consul` script assumes it is running on an EC2 Instance with an [IAM 
-Role](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html) that has the following permissions:
-
-* `ec2:DescribeInstances`
-* `ec2:DescribeTags`
-* `autoscaling:DescribeAutoScalingGroups`
-
-These permissions are automatically added by the [consul-cluster module](https://github.com/gruntwork-io/terraform-consul-azure/modules/consul-cluster).
-
-
-
-
 ## How do you handle encryption?
 
 Consul can encrypt all of its network traffic (see the [encryption docs for 
 details](https://www.consul.io/docs/agent/encryption.html)), but by default, encryption is not enabled in this 
-Blueprint. To enable encryption, you need to do the following:
+Module. To enable encryption, you need to do the following:
 
 1. [Gossip encryption: provide an encryption key](#gossip-encryption-provide-an-encryption-key)
 1. [RPC encryption: provide TLS certificates](#rpc-encryption-provide-tls-certificates)

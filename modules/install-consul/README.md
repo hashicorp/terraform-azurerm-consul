@@ -16,7 +16,7 @@ There is a good chance it will work on other flavors of Debian, CentOS, and RHEL
 
 ## Quick start
 
-<!-- TODO: update the clone URL to the final URL when this Blueprint is released -->
+<!-- TODO: update the clone URL to the final URL when this Module is released -->
 
 To install Consul, use `git` to clone this repository at a specific tag (see the [releases page](../../../../releases) 
 for all available tags) and run the `install-consul` script:
