@@ -71,8 +71,8 @@ Your code should look more like this:
 }
 ```
 
-You should replace `<MODULE_VERSION>` in the code above with the version of this blueprint that you want to use (see
+You should replace `<MODULE_VERSION>` in the code above with the version of this module that you want to use (see
 the [Releases Page](../../releases) for all available versions). That's because for production usage, you should always
-use a fixed, known version of this Blueprint, downloaded from the official Git repo. On the other hand, when you're 
-just experimenting with the Blueprint, it's OK to use a local checkout of the Blueprint, uploaded from your own 
+use a fixed, known version of this Module, downloaded from the official Git repo. On the other hand, when you're 
+just experimenting with the Module, it's OK to use a local checkout of the Module, uploaded from your own 
 computer.
