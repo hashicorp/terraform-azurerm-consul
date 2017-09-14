@@ -9,7 +9,7 @@ There is a good chance it will work on other flavors of Debian as well.
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Consul itself), using the [install-consul 
-module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul). The default install path is `/opt/consul/bin`, so to start Consul in server mode, 
+module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/install-consul). The default install path is `/opt/consul/bin`, so to start Consul in server mode, 
 you run:
 
 ```
@@ -39,7 +39,7 @@ Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/in
 when the Azure Instance is first booting. After runing `run-consul` on that initial boot, the `supervisord` configuration 
 will automatically restart Consul if it crashes or the Azure instance reboots.
 
-See the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster) for fully-working sample code.
+See the [consul-cluster example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-cluster) for fully-working sample code.
 
 
 
