@@ -1,23 +1,12 @@
 # Consul Install Script
 
 This folder contains a script for installing Consul and its dependencies. Use this script along with the
-[run-consul script](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul) to create a Consul [Amazon Machine Image 
-(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that can be deployed in 
-[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster).
+[run-consul script](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul) to create a Consul [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) that can be deployed in 
+[Azure](https://azure.microsoft.com/) across a Scale Set using the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster).
 
-This script has been tested on the following operating systems:
-
-* Ubuntu 16.04
-* Amazon Linux
-
-There is a good chance it will work on other flavors of Debian, CentOS, and RHEL as well.
-
-
+This script has been tested on Ubuntu 16.04. There is a good chance it will work on other flavors of Debian as well.
 
 ## Quick start
-
-<!-- TODO: update the clone URL to the final URL when this Module is released -->
-
 To install Consul, use `git` to clone this repository at a specific tag (see the [releases page](../../../../releases) 
 for all available tags) and run the `install-consul` script:
 
@@ -31,12 +20,10 @@ The `run-consul` script is also run when the server is booting to start Consul a
 join other nodes to form a cluster.
 
 We recommend running the `install-consul` script as part of a [Packer](https://www.packer.io/) template to create a
-Consul [Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) (see the 
-[consul-ami example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-ami) for a fully-working sample code). You can then deploy the AMI across an Auto 
-Scaling Group using the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster) (see the [consul-cluster 
-example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-cluster) for fully-working sample code).
-
-
+Consul [Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) (see the 
+[consul-image example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-image) for a 
+fully-working sample code). You can then deploy the Image across an Scale Set using the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster) 
+(see the [main example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/MAIN.md) for fully-working sample code).
 
 
 ## Command line Arguments

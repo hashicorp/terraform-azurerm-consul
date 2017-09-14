@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script is used to configure and run Consul on an AWS server.
+# This script is used to configure and run Consul on an Azure server.
 
 set -e
 
@@ -16,7 +16,7 @@ function print_usage {
   echo
   echo "Usage: run-consul [OPTIONS]"
   echo
-  echo "This script is used to configure and run Consul on an AWS server."
+  echo "This script is used to configure and run Consul on an Azure server."
   echo
   echo "Options:"
   echo

@@ -85,6 +85,6 @@ variable "num_clients" {
 }
 
 variable "cluster_tag_key" {
-  description = "The tag the EC2 Instances will look for to automatically discover each other and form a cluster."
+  description = "The tag the Azure Instances will look for to automatically discover each other and form a cluster."
   default = "consul-servers"
 }
