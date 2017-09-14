@@ -9,7 +9,7 @@ There is a good chance it will work on other flavors of Debian as well.
 ## Quick start
 
 This script assumes you installed it, plus all of its dependencies (including Consul itself), using the [install-consul 
-module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/install-consul). The default install path is `/opt/consul/bin`, so to start Consul in server mode, 
+module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/install-consul). The default install path is `/opt/consul/bin`, so to start Consul in server mode, 
 you run:
 
 ```
@@ -39,7 +39,7 @@ Data](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/classic/in
 when the Azure Instance is first booting. After runing `run-consul` on that initial boot, the `supervisord` configuration 
 will automatically restart Consul if it crashes or the Azure instance reboots.
 
-See the [consul-cluster example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster) for fully-working sample code.
+See the [consul-cluster example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-cluster) for fully-working sample code.
 
 
 
@@ -72,7 +72,7 @@ Example:
 ## Consul configuration
 
 `run-consul` generates a configuration file for Consul called `default.json` that tries to figure out reasonable 
-defaults for a Consul cluster in AWS. Check out the [Consul Configuration Files 
+defaults for a Consul cluster in Azure. Check out the [Consul Configuration Files 
 documentation](https://www.consul.io/docs/agent/options.html#configuration-files) for what configuration settings are
 available.
   
@@ -81,28 +81,18 @@ available.
 
 `run-consul` sets the following configuration values by default:
   
-* [advertise_addr](https://www.consul.io/docs/agent/options.html#advertise_addr): Set to the EC2 Instance's private IP 
-  address, as fetched from [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
+* [advertise_addr](https://www.consul.io/docs/agent/options.html#advertise_addr): Set to the Azure Instance's private IP 
+  address.
 
-* [bind_addr](https://www.consul.io/docs/agent/options.html#bind_addr): Set to the EC2 Instance's private IP address, 
-  as fetched from [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
-
-* [bootstrap_expect](https://www.consul.io/docs/agent/options.html#bootstrap_expect): If `--server` is set, 
-  set this config based on the EC2 Instance's tags (using the 
-  [describe-tags API](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-tags.html)): 
-    * If there is a `aws:autoscaling:groupName` tag, that means this EC2 Instance is part of an Auto Scaling Group 
-      (ASG), so set this config to the desired capacity of the ASG (fetched via the [describe-auto-scaling-groups 
-      API](https://docs.aws.amazon.com/cli/latest/reference/autoscaling/describe-auto-scaling-groups.html)). 
-    * Otherwise, log a warning, and set this to 1. This fallback is not recommended!     
+* [bind_addr](https://www.consul.io/docs/agent/options.html#bind_addr): Set to the Azure Instance's private IP address.
 
 * [client_addr](https://www.consul.io/docs/agent/options.html#client_addr): Set to 0.0.0.0 so you can access the client
-  and UI endpoint on each EC2 Instance from the outside.
+  and UI endpoint on each Azure Instance from the outside.
 
-* [datacenter](https://www.consul.io/docs/agent/options.html#datacenter): Set to the current AWS region (e.g. 
-  `us-east-1`), as fetched from [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
+* [datacenter](https://www.consul.io/docs/agent/options.html#datacenter): Set to the current Azure location (e.g. 
+  `East US`).
 
-* [node_name](https://www.consul.io/docs/agent/options.html#node_name): Set to the instance id, as fetched from 
-  [Metadata](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html).
+* [node_name](https://www.consul.io/docs/agent/options.html#node_name): Set to the instance id.
      
 * [server](https://www.consul.io/docs/agent/options.html#server): Set to true if `--server` is set.
 

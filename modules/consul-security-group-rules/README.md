@@ -3,18 +3,18 @@
 This folder contains a [Terraform](https://www.terraform.io/) module that defines the security group rules used by a 
 [Consul](https://www.consul.io/) cluster to control the traffic that is allowed to go in and out of the cluster. 
 
-Normally, you'd get these rules by default if you're using the [consul-cluster module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-cluster), but if 
+Normally, you'd get these rules by default if you're using the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-cluster), but if 
 you're running Consul on top of a different cluster, then you can use this module to add the necessary security group 
 rules to that cluster. For example, imagine you were using the [nomad-cluster 
-module](https://github.com/gruntwork-io/nomad-aws-module/tree/master/modules/nomad-cluster) to run a cluster of 
+module](https://github.com/hashicorp/terraform-aws-nomad/tree/master/modules/nomad-cluster) to run a cluster of 
 servers that have both Nomad and Consul on each node:
 
 ```hcl
 module "nomad_servers" {
-  source = "git::git@github.com:gruntwork-io/nomad-aws-module.git//modules/nomad-cluster?ref=v0.0.1"
+  source = "git::git@github.com:gruntwork-io/terraform-azurerm-nomad.git//modules/nomad-cluster?ref=v0.0.1"
   
-  # This AMI has both Nomad and Consul installed
-  ami_id = "ami-1234abcd"
+  # This Azure Image has both Nomad and Consul installed
+  image_url = "/subscriptions/[redacted]/resourceGroups/consul/providers/Microsoft.Compute/images/consul"
 }
 ```
 
@@ -23,7 +23,7 @@ have the necessary ports open for using Consul, you can use this module as follo
 
 ```hcl
 module "security_group_rules" {
-  source = "git::git@github.com:gruntwork-io/terraform-consul-azure.git//modules/consul-security-group-rules?ref=v0.0.2"
+  source = "git::git@github.com:hashicorp/terraform-azurerm-consul.git//modules/consul-security-group-rules?ref=v0.0.2"
 
   security_group_id = "${module.nomad_servers.security_group_id}"
   
@@ -44,4 +44,4 @@ Note the following parameters:
   
 You can find the other parameters in [vars.tf](vars.tf).
 
-Check out the [consul-cluster module](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/modules/consul-cluster) for working sample code.
+Check out the [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster) for working sample code.

@@ -22,7 +22,7 @@ To install Dnsmasq, use `git` to clone this repository at a specific tag (see th
 for all available tags) and run the `install-dnsmasq` script:
 
 ```
-git clone --branch <VERSION> https://github.com/gruntwork-io/terraform-consul-azure.git
+git clone --branch <VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git
 terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq
 ```
 
@@ -35,8 +35,8 @@ dig foo.service.consul
 ```
 
 We recommend running the `install-dnsmasq` script as part of a [Packer](https://www.packer.io/) template to create an
-[Amazon Machine Image (AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) (see the 
-[consul-ami example](https://github.com/gruntwork-io/terraform-consul-azure/tree/master/examples/consul-ami) for sample code). 
+[Azure Managed Image](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/build-image-with-packer) (see the 
+[consul-ami example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-image) for sample code). 
 
 
 
