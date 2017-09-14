@@ -1,4 +1,4 @@
-# Consul AWS Module
+# Consul Azure Module
 
 This repo contains a Module for deploying a [Consul](https://www.consul.io/) cluster on 
 [Azure](https://azure.microsoft.com/) using [Terraform](https://www.terraform.io/). Consul is a distributed, highly-available 

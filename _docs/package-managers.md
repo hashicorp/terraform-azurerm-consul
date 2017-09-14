@@ -19,7 +19,7 @@ We need to write and package the scripts in this Module in a way that satisfies 
   as that's what many people use for development.
 
 - **Handles dependencies**. These scripts rely on certain dependencies being installed on the system, such as `curl`,
-  `wget`, `jq`, `aws`, and so on. We need a way to automatically manage and install these dependencies that works
+  `wget`, `jq`, `azure-cli`, and so on. We need a way to automatically manage and install these dependencies that works
   across all major Linux distributions. 
 
 - **Simple package manager installation**: We don't want a package manager that takes a dozen steps to install. 

@@ -71,12 +71,12 @@ module "consul_servers" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# THE USER DATA SCRIPT THAT WILL RUN ON EACH CONSUL SERVER AZURE INSTANCE WHEN IT'S BOOTING
+# THE CUSTOM DATA SCRIPT THAT WILL RUN ON EACH CONSUL SERVER AZURE INSTANCE WHEN IT'S BOOTING
 # This script will configure and start Consul
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "template_file" "user_data_server" {
-  template = "${file("${path.module}/user-data-server.sh")}"
+  template = "${file("${path.module}/custom-data-server.sh")}"
 
   vars {
     scale_set_name = "${var.cluster_name}-server"
@@ -127,12 +127,12 @@ module "consul_clients" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# THE USER DATA SCRIPT THAT WILL RUN ON EACH CONSUL CLIENT AZURE COMPUTE INSTANCE WHEN IT'S BOOTING
+# THE CUSTOM DATA SCRIPT THAT WILL RUN ON EACH CONSUL CLIENT AZURE COMPUTE INSTANCE WHEN IT'S BOOTING
 # This script will configure and start Consul
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "template_file" "user_data_client" {
-  template = "${file("${path.module}/user-data-client.sh")}"
+  template = "${file("${path.module}/custom-data-client.sh")}"
 
   vars {
     scale_set_name = "${var.cluster_name}-client"
