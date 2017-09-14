@@ -13,6 +13,9 @@ run alongside your apps:
 
 Each Module has the following folder structure:
 
+* [root](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/MAIN.md): This folder shows an example of 
+Terraform code that uses the [consul-cluster](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster) 
+module to deploy a [Consul](https://www.consul.io/) cluster in [Azure](https://azure.microsoft.com/)
 * [modules](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
 * [examples](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples): This folder contains examples of how to use the modules.
 * [test](https://github.com/hashicorp/terraform-azurerm-consul/test): Automated tests for the modules and examples.
