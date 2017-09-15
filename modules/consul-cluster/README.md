@@ -115,7 +115,7 @@ bar
 
 Finally, you can try opening up the Consul UI in your browser at the URL `http://11.22.33.44:8500/ui/`.
 
-![Consul UI](/_docs/consul-ui-screenshot.png)
+![Consul UI](https://raw.githubusercontent.com/hashicorp/terraform-azurerm-consul/master/_docs/consul-ui-screenshot.png)
 
 
 ## What's included in this module?
