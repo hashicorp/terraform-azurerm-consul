@@ -6,7 +6,7 @@ set -e
 readonly CONSUL_CONFIG_FILE="default.json"
 readonly SUPERVISOR_CONFIG_PATH="/etc/supervisor/conf.d/run-consul.conf"
 
-readonly AZURE_INSTANCE_METADATA_URL="http://169.254.169.254/metadata/instance?api-version=2017-07-01"
+readonly AZURE_INSTANCE_METADATA_URL="http://169.254.169.254/metadata/instance?api-version=2017-08-01"
 readonly DEFAULT_RAFT_PROTOCOL="3"
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
