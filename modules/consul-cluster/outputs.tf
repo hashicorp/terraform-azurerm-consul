@@ -9,3 +9,7 @@ output "cluster_size" {
 output "load_balancer_ip_address" {
   value = "${azurerm_public_ip.consul_access.*.ip_address}"
 }
+
+output "load_balancer_id" {
+  value = "${azurerm_public_ip.consul_access.*.id}"
+}
