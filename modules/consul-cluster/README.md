@@ -122,7 +122,7 @@ Finally, you can try opening up the Consul UI in your browser at the URL `http:/
 
 This module creates the following architecture:
 
-![Consul architecture](/_docs/architecture.png)
+![Consul architecture](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/_docs/architecture.png)
 
 ## How do you roll out updates?
 
