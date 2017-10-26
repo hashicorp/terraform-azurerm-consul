@@ -23,7 +23,7 @@ module to deploy a [Consul](https://www.consul.io/) cluster in [Azure](https://a
 To deploy Consul servers using this Module:
 
 1. Create a Consul Image using a Packer template that references the [install-consul module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/install-consul).
-   Here is an [example Packer template](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-ami#quick-start).  
+   Here is an [example Packer template](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-image).
    
 1. Deploy that Image in a Scale Set using the Terraform [consul-cluster module](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/consul-cluster) 
    and execute the [run-consul script](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul) with the `--server` flag during boot on each 
