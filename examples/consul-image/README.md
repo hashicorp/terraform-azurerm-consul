@@ -42,13 +42,13 @@ provisioner. Instead of:
 {
   "provisioners": [{
     "type": "file",
-    "source": "{{template_dir}}/../../../terraform-consul-azure",
+    "source": "{{template_dir}}/../../../terraform-azurerm-consul",
     "destination": "/tmp"
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-consul-azure/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq"
+      "/tmp/terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
@@ -62,9 +62,9 @@ Your code should look more like this:
   "provisioners": [{
     "type": "shell",
     "inline": [
-      "git clone --branch <MODULE_VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git /tmp/terraform-consul-azure",
-      "/tmp/terraform-consul-azure/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-consul-azure/tree/master/modules/install-dnsmasq/install-dnsmasq"
+      "git clone --branch <MODULE_VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git /tmp/terraform-azurerm-consul",
+      "/tmp/terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
