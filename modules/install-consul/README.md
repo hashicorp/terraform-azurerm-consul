@@ -12,7 +12,7 @@ for all available tags) and run the `install-consul` script:
 
 ```
 git clone --branch <VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git
-terraform-consul-azure/tree/master/modules/install-consul/install-consul --version 0.8.0
+terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version 0.8.0
 ```
 
 The `install-consul` script will install Consul, its dependencies, and the [run-consul script](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul).
