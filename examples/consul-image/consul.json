@@ -41,8 +41,8 @@
         "apt-get update && apt-get install -y libssl-dev libffi-dev python-dev build-essential apt-transport-https azure-cli",
         "DEBIAN_FRONTEND=noninteractive apt-get -y upgrade",
 
-        "/tmp/terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-        "/tmp/terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq",
+        "/tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
+        "/tmp/terraform-azurerm-consul/modules/install-dnsmasq/install-dnsmasq",
         "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
       ],
       "inline_shebang": "/bin/sh -x",
