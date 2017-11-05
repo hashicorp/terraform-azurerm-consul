@@ -18,7 +18,6 @@ Terraform code that uses the [consul-cluster](https://github.com/hashicorp/terra
 module to deploy a [Consul](https://www.consul.io/) cluster in [Azure](https://azure.microsoft.com/)
 * [modules](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules): This folder contains the reusable code for this Module, broken down into one or more modules.
 * [examples](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples): This folder contains examples of how to use the modules.
-* [test](https://github.com/hashicorp/terraform-azurerm-consul/test): Automated tests for the modules and examples.
 
 To deploy Consul servers using this Module:
 
