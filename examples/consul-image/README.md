@@ -27,7 +27,7 @@ To build the Consul Image:
 1. Run `packer build consul.json`.
 
 When the build finishes, it will output the IDs of the new AMIs. To see how to deploy one of these Images, check out the 
-[consul-cluster example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-cluster).
+[consul-cluster example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/).
 
 
 
