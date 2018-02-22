@@ -6,7 +6,7 @@ Machine Scale Sets (VMSSs): one with a small number of Consul server nodes, whic
 [consensus quorum](https://www.consul.io/docs/internals/consensus.html), and one with a larger number of client nodes, 
 which would typically run alongside your apps:
 
-![Consul architecture](https://github.com/hashicorp/terraform-azurerm-consul/_docs/architecture.png)
+![Consul architecture](https://raw.githubusercontent.com/hashicorp/terraform-azurerm-consul/master/_docs/architecture.png)
 
 You will need to create an Azure Image that has Consul installed, which you can do using the 
 [consul-image example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/examples/consul-image)). Note that to keep this example simple, both the server VMSS and client 
