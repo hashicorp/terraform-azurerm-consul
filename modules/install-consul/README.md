@@ -12,7 +12,7 @@ for all available tags) and run the `install-consul` script:
 
 ```
 git clone --branch <VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git
-terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version 0.8.0
+terraform-azurerm-consul/modules/install-consul/install-consul --version 0.8.0
 ```
 
 The `install-consul` script will install Consul, its dependencies, and the [run-consul script](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/run-consul).
@@ -94,5 +94,5 @@ After the `install-consul` script finishes running, you may wish to do the follo
 
 We needed an easy way to install these scripts that satisfied a number of requirements, including working on a variety 
 of operating systems and supported versioning. Our current solution is to use `git`, but this may change in the future.
-See [Package Managers](https://github.com/hashicorp/terraform-azurerm-vault/tree/master/_docs/package-managers.md) for a full discussion of the requirements, trade-offs, and why we
+See [Package Managers](https://github.com/hashicorp/terraform-aws-consul/blob/master/_docs/package-managers.md) for a full discussion of the requirements, trade-offs, and why we
 picked `git`.

@@ -23,7 +23,7 @@ for all available tags) and run the `install-dnsmasq` script:
 
 ```
 git clone --branch <VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git
-terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq
+terraform-azurerm-consul/modules/install-dnsmasq/install-dnsmasq
 ```
 
 Note: by default, the `install-dnsmasq` script assumes that a Consul agent is already running locally and connected to 
