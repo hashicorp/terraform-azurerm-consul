@@ -26,6 +26,7 @@ function print_usage {
   echo -e "  --tenant-id\t\t the Azure Tenant Id. Required."
   echo -e "  --client-id\t\t the Azure Client Id. Required."
   echo -e "  --secret-access-key\t\t the Azure Secret Access Key. Required."
+  echo -e "  --resource-group-name\t\t the Azure Resource Group to discover consul servers from. Default is the VMs own resource group."
   echo -e "  --config-dir\t\tThe path to the Consul config folder. Optional. Default is the absolute path of '../config', relative to this script."
   echo -e "  --data-dir\t\tThe path to the Consul data folder. Optional. Default is the absolute path of '../data', relative to this script."
   echo -e "  --log-dir\t\tThe path to the Consul log folder. Optional. Default is the absolute path of '../log', relative to this script."
@@ -307,6 +308,11 @@ function run {
         scale_set_name="$2"
         shift
         ;;
+      --resource-group-name)
+        assert_not_empty "$key" "$2"
+        resource_group="$2"
+        shift
+        ;;
       --raft-protocol)
         assert_not_empty "$key" "$2"
         raft_protocol="$2"
@@ -420,7 +426,9 @@ function run {
     log_info "The --skip-consul-config flag is set, so will not generate a default Consul config file."
   else
     instance_id=$(get_instance_id)
+  if [[ ! $resource_group ]]; then
     resource_group=$(get_instance_resource_group)
+  fi
 
     if [[ -z "$scale_set_name" ]]; then
       scale_set_name=$(find_scale_set "$resource_group" "$instance_id")
