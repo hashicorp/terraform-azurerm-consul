@@ -1,4 +1,4 @@
-[![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io/?ref=azure_consul_repo)
+[![Maintained by Gruntwork.io](https://img.shields.io/badge/maintained%20by-gruntwork.io-%235849a6.svg)](https://gruntwork.io/?ref=repo_azure_consul)
 # Consul Azure Module
 
 This repo contains a Module for deploying a [Consul](https://www.consul.io/) cluster on 
