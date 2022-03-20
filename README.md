@@ -1,3 +1,9 @@
+# DISCLAIMER: This is no longer supported.
+Moving forward in the future this repository will be no longer supported and eventually lead to
+deprecation. Please use our latest versions of our products moving forward or alternatively you
+may fork the repository to continue use and development for your personal/business use.
+
+---
 # Consul Azure Module
 
 This repo contains a Module for deploying a [Consul](https://www.consul.io/) cluster on 
@@ -54,7 +60,7 @@ a version number bump.
  
 ## Who maintains this Module?
 
-This Module is maintained by [Gruntwork](http://www.gruntwork.io/). If you're looking for help or commercial 
+This Module is maintained by [Gruntwork](https://www.gruntwork.io/?ref=repo_azure_consul). If you're looking for help or commercial 
 support, send an email to [modules@gruntwork.io](mailto:modules@gruntwork.io?Subject=Consul%20Module). 
 Gruntwork can help with:
 
