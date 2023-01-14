@@ -29,7 +29,7 @@ module "consul_cluster" {
               /opt/consul/bin/run-consul --server --cluster-tag-key consul-cluster
               EOF
   
-  # ... See vars.tf for the other parameters you must define for the consul-cluster module
+  # ... See variables.tf for the other parameters you must define for the consul-cluster module
 }
 ```
 
@@ -51,7 +51,7 @@ cluster. You should install Vault in this image using the scripts in the [instal
   run Vault. The `run-vault` script is one of the scripts installed by the [install-vault](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/modules/install-vault) 
   module. 
 
-You can find the other parameters in [vars.tf](vars.tf).
+You can find the other parameters in [variables.tf](variables.tf).
 
 Check out the [main example](https://github.com/hashicorp/terraform-azurerm-consul/tree/master/MAIN.md) for fully-working sample code. 
 
