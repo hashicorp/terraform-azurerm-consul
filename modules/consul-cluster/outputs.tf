@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 output "scale_set_name" {
   value = "${element(concat(azurerm_virtual_machine_scale_set.consul_with_load_balancer.*.name, azurerm_virtual_machine_scale_set.consul.*.name), 0)}"
 }

@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
 output "num_servers" {
   value = "${module.consul_servers.cluster_size}"
 }
