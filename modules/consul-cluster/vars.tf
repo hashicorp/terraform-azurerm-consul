@@ -14,10 +14,6 @@ variable "resource_group_name" {
   description = "The name of the resource group that the resources for consul will run in"
 }
 
-variable "storage_account_name" {
-  description = "The name of the storage account that will be used for images"
-}
-
 variable "subnet_id" {
   description = "The id of the subnet to deploy the cluster into"
 }
