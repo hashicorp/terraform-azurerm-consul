@@ -47,8 +47,8 @@ provisioner. Instead of:
   },{
     "type": "shell",
     "inline": [
-      "/tmp/terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq"
+      "/tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-azurerm-consul/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
@@ -63,8 +63,8 @@ Your code should look more like this:
     "type": "shell",
     "inline": [
       "git clone --branch <MODULE_VERSION> https://github.com/hashicorp/terraform-azurerm-consul.git /tmp/terraform-azurerm-consul",
-      "/tmp/terraform-azurerm-consul/tree/master/modules/install-consul/install-consul --version {{user `consul_version`}}",
-      "/tmp/terraform-azurerm-consul/tree/master/modules/install-dnsmasq/install-dnsmasq"
+      "/tmp/terraform-azurerm-consul/modules/install-consul/install-consul --version {{user `consul_version`}}",
+      "/tmp/terraform-azurerm-consul/modules/install-dnsmasq/install-dnsmasq"
     ],
     "pause_before": "30s"
   }]
