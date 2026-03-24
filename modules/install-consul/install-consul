@@ -172,7 +172,7 @@ function install_binaries {
 
   log_info "Downloading Consul $version from $url to $download_path"
   curl -o "$download_path" "$url"
-  unzip -d /tmp "$download_path"
+  unzip -o -d /tmp "$download_path"
 
   log_info "Moving Consul binary to $consul_dest_path"
   sudo mv "/tmp/consul" "$consul_dest_path"

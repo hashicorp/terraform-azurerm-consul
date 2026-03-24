@@ -111,16 +111,16 @@ function get_other_scale_set_member_ip {
     local readonly scale_set_name="$2"
     local readonly my_ip_address="$3"
 
-    ip_list=($(az vmss nic list --resource-group "$resource_group_name" --vmss-name "$scale_set_name" | jq '.[].ipConfigurations[].privateIpAddress'))
+    ip_list=($(az vmss nic list --resource-group "$resource_group_name" --vmss-name "$scale_set_name" | jq -r '.[].ipConfigurations[].privateIpAddress // empty'))
     other_ip=""
 
     for ip in ${ip_list[@]}; do
-        if [[ "$my_ip_address" != "$ip" ]]; then
+        if [[ "$my_ip_address" != "$ip" ]] && [[ "$ip" != "null" ]]; then
             other_ip="$ip"
         fi
     done
 
-    if [[ -z "$other_ip" ]]; then
+    if [[ -z "$other_ip" ]] || [[ "$other_ip" == "null" ]]; then
         log_warn "This Azure Instance does not appear to be part of a Scale Set, so cannot set retry_join peer."
         echo ""
     else
@@ -182,34 +182,39 @@ function generate_consul_config {
   local readonly raft_protocol="$2"
   local readonly config_dir="$3"
   local readonly user="$4"
-  local readonly instance_resource_group="$5"
-  local readonly instance_id="$6"
-  local readonly scale_set_name="$7"
+  local readonly scale_set_name="$5"
   local readonly config_path="$config_dir/$CONSUL_CONFIG_FILE"
 
   local instance_ip_address=""
+  local instance_id=""
   local instance_location=""
+  local instance_resource_group=""
 
   instance_ip_address=$(get_instance_ip_address)
+  instance_id=$(get_instance_id)
   instance_location=$(get_instance_location)
-  peer_ip=$(get_other_scale_set_member_ip "$instance_resource_group" "$scale_set_name" "$instance_ip_address")
+  instance_resource_group=$(get_instance_resource_group)
 
   local retry_join_json=""
-  if [[ -z "$peer_ip" ]]; then
-    log_warn "Can not determine another scale set member. Will not automatically try to form a cluster based on Azure scale set."
+  if [[ -z "$scale_set_name" ]]; then
+    log_warn "Scale set name not provided. retry_join will not be configured."
   else
-    retry_join_json=$(cat <<EOF
-"retry_join": [$peer_ip],
+    local peer_ip=""
+    peer_ip=$(get_other_scale_set_member_ip "$instance_resource_group" "$scale_set_name" "$instance_ip_address")
+    if [[ -z "$peer_ip" ]]; then
+      log_warn "Cannot determine another scale set member. retry_join will not be configured."
+    else
+      retry_join_json=$(cat <<EOF
+    "retry_join": ["$peer_ip"],
 EOF
 )
+    fi
   fi
 
   local bootstrap_expect=""
   if [[ "$server" == "true" ]]; then
     local cluster_size=""
-
     cluster_size=$(get_cluster_size "$instance_resource_group" "$scale_set_name")
-
     bootstrap_expect="\"bootstrap_expect\": $cluster_size,"
   fi
 
@@ -224,7 +229,6 @@ EOF
   "node_name": "$instance_id",
   $retry_join_json
   "server": $server,
-  "ui": true,
   "raft_protocol": $raft_protocol
 }
 EOF
@@ -269,8 +273,13 @@ function do_azure_login {
   local tenant_id="$1"
   local client_id="$2"
   local secret_access_key="$3"
+  local cloud_environment="$4"
+  local subscription_id="$5"
+  log_info "Setting Azure cloud environment: $cloud_environment"
+  az cloud set --name "$cloud_environment"
   log_info "Logging into the Azure API as service principal $client_id"
   result=$(az login --service-principal -u "$client_id" -p "$secret_access_key" --tenant "$tenant_id")
+  az account set -s "$subscription_id"
 }
 
 function run {
@@ -282,8 +291,7 @@ function run {
   local log_dir=""
   local bin_dir=""
   local user=""
-  local cluster_tag_key="$AZURE_TAG_KEY"
-  local cluster_tag_value=""
+  local cloud_environment="AzurePublicCloud"
   local subscription_id=""
   local tenant_id=""
   local client_id=""
@@ -360,6 +368,10 @@ function run {
         secret_access_key="$2"
         shift
         ;;
+      --cloud-environment)
+        cloud_environment="$2"
+        shift
+        ;;
       --help)
         print_usage
         exit
@@ -379,7 +391,7 @@ function run {
   assert_not_empty "client-id" "$client_id"
   assert_not_empty "secret-access-key" "$secret_access_key"
 
-  do_azure_login "$tenant_id" "$client_id" "$secret_access_key"
+  do_azure_login "$tenant_id" "$client_id" "$secret_access_key" "$cloud_environment" "$subscription_id"
 
   if [[ ("$server" == "true" && "$client" == "true") || ("$server" == "false" && "$client" == "false") ]]; then
     log_error "Exactly one of --server or --client must be set."
@@ -431,8 +443,6 @@ function run {
         "$raft_protocol" \
         "$config_dir" \
         "$user" \
-        "$resource_group" \
-        "$instance_id" \
         "$scale_set_name"
   fi
 
